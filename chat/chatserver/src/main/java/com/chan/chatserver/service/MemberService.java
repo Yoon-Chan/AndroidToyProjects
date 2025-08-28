@@ -1,6 +1,7 @@
 package com.chan.chatserver.service;
 
 import com.chan.chatserver.domain.Member;
+import com.chan.chatserver.dto.MemberListResDto;
 import com.chan.chatserver.dto.MemberLoginReqDto;
 import com.chan.chatserver.dto.MemberSaveReqDto;
 import com.chan.chatserver.repository.MemberRepository;
@@ -8,6 +9,9 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -41,5 +45,10 @@ public class MemberService {
         }
 
         return member;
+    }
+
+    public List<MemberListResDto> findAll() {
+       return memberRepository.findAll().stream()
+                .map(MemberListResDto::fromMember).toList();
     }
 }
