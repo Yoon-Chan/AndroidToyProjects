@@ -1,4 +1,4 @@
-package com.chan.chatserver.domain;
+package com.chan.chatserver.member.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

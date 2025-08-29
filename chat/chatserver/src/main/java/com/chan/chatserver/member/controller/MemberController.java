@@ -1,10 +1,10 @@
-package com.chan.chatserver.controller;
+package com.chan.chatserver.member.controller;
 
 import com.chan.chatserver.common.auth.JwtTokenProvider;
-import com.chan.chatserver.domain.Member;
-import com.chan.chatserver.dto.MemberListResDto;
-import com.chan.chatserver.dto.MemberLoginReqDto;
-import com.chan.chatserver.dto.MemberSaveReqDto;
+import com.chan.chatserver.member.domain.Member;
+import com.chan.chatserver.member.dto.MemberListResDto;
+import com.chan.chatserver.member.dto.MemberLoginReqDto;
+import com.chan.chatserver.member.dto.MemberSaveReqDto;
 import com.chan.chatserver.service.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

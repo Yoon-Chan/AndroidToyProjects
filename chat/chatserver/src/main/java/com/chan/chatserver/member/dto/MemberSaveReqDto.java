@@ -1,4 +1,4 @@
-package com.chan.chatserver.dto;
+package com.chan.chatserver.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

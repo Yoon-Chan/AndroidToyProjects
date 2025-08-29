@@ -34,7 +34,7 @@ public class SecurityConfigs {
                 //특정 URL 패턴에서는 인증 제외하기
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/member/create", "/member/doLogin")
+                                .requestMatchers("/member/create", "/member/doLogin", "/connect")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

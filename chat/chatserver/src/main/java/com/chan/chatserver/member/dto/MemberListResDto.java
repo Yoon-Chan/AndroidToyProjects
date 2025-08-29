@@ -1,6 +1,6 @@
-package com.chan.chatserver.dto;
+package com.chan.chatserver.member.dto;
 
-import com.chan.chatserver.domain.Member;
+import com.chan.chatserver.member.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
