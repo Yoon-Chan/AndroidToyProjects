@@ -104,7 +104,7 @@ public class ChatService {
         //이미 참여자인지 검증
         //ChatParticipant 객체 생성 후 저장
         Optional<ChatParticipant> participant = chatParticipantRepository.findByChatRoomAndMember(chatRoom, member);
-        if(participant.isEmpty()) {
+        if (participant.isEmpty()) {
             addParticipantToRoom(chatRoom, member);
         }
     }
@@ -116,5 +116,38 @@ public class ChatService {
                 .build();
 
         chatParticipantRepository.save(chatParticipant);
+    }
+
+    public List<ChatMessageReqDto> getChatHistory(Long roomId) {
+        //내가 해당 채팅방의 참여자가 아닐 경우 에러 발생
+        //채팅방 조회
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room can't bean found"));
+
+        //보낸 사람이 누군지
+        Member sender = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
+        boolean check = false;
+        for (ChatParticipant chatParticipant : chatParticipants) {
+            if (chatParticipant.getMember().equals(sender)) {
+                check = true;
+                break;
+            }
+        }
+        if (!check) throw new IllegalArgumentException("본인이 속하지 않은 채팅방입니다.");
+        return chatMessageRepository.findByChatRoomOrderByCreatedTimeAsc(chatRoom).stream().map(ChatMessageReqDto::from).toList();
+    }
+
+    public boolean isRoomParticipant(String email, Long roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room can't bean found"));
+
+        //보낸 사람이 누군지
+        Member sender = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
+        for (ChatParticipant chatParticipant : chatParticipants) {
+            if (chatParticipant.getMember().equals(sender)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
