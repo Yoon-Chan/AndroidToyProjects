@@ -12,6 +12,7 @@ import com.chan.chatserver.chat.repository.ReadStatusRepository;
 import com.chan.chatserver.member.domain.Member;
 import com.chan.chatserver.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +57,7 @@ public class ChatService {
 
         //사용자별로 읽음 여부 저장
         List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
-        for(ChatParticipant chatParticipant : chatParticipants) {
+        for (ChatParticipant chatParticipant : chatParticipants) {
             ReadStatus readStatus = ReadStatus.builder()
                     .chatRoom(chatRoom)
                     .member(chatParticipant.getMember())
@@ -65,5 +66,24 @@ public class ChatService {
                     .build();
             readStatusRepository.save(readStatus);
         }
+    }
+
+    public void creatGroupRoom(String roomName) {
+        Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new EntityNotFoundException("member can't bean found"));
+
+        //채팅방 생성
+        ChatRoom chatRoom = ChatRoom.builder()
+                .name(roomName)
+                .isGroupChat("Y")
+                .build();
+        chatRoomRepository.save(chatRoom);
+
+        //채팅참여자로 개설자 추가
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .chatRoom(chatRoom)
+                .member(member)
+                .build();
+        chatParticipantRepository.save(chatParticipant);
     }
 }
