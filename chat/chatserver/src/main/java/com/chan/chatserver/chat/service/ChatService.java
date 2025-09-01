@@ -5,6 +5,7 @@ import com.chan.chatserver.chat.domain.ChatParticipant;
 import com.chan.chatserver.chat.domain.ChatRoom;
 import com.chan.chatserver.chat.domain.ReadStatus;
 import com.chan.chatserver.chat.dto.ChatMessageReqDto;
+import com.chan.chatserver.chat.dto.ChatRoomListResDto;
 import com.chan.chatserver.chat.repository.ChatMessageRepository;
 import com.chan.chatserver.chat.repository.ChatParticipantRepository;
 import com.chan.chatserver.chat.repository.ChatRoomRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -84,6 +86,35 @@ public class ChatService {
                 .chatRoom(chatRoom)
                 .member(member)
                 .build();
+        chatParticipantRepository.save(chatParticipant);
+    }
+
+    public List<ChatRoomListResDto> getGroupChatRooms() {
+        return chatRoomRepository.findByIsGroupChat("Y").stream().map(ChatRoomListResDto::from).toList();
+    }
+
+    public void addParticipantToGroupChat(Long roomId) {
+        //채팅방 조회
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room can't bean found"));
+
+        //Member조회
+        Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new EntityNotFoundException("member can't bean found"));
+
+        //이미 참여자인지 검증
+        //ChatParticipant 객체 생성 후 저장
+        Optional<ChatParticipant> participant = chatParticipantRepository.findByChatRoomAndMember(chatRoom, member);
+        if(participant.isEmpty()) {
+            addParticipantToRoom(chatRoom, member);
+        }
+    }
+
+    public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
+        ChatParticipant chatParticipant = ChatParticipant.builder()
+                .chatRoom(chatRoom)
+                .member(member)
+                .build();
+
         chatParticipantRepository.save(chatParticipant);
     }
 }
