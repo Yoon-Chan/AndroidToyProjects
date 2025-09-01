@@ -6,6 +6,7 @@ import com.chan.chatserver.chat.domain.ChatRoom;
 import com.chan.chatserver.chat.domain.ReadStatus;
 import com.chan.chatserver.chat.dto.ChatMessageReqDto;
 import com.chan.chatserver.chat.dto.ChatRoomListResDto;
+import com.chan.chatserver.chat.dto.MyChatListResDto;
 import com.chan.chatserver.chat.repository.ChatMessageRepository;
 import com.chan.chatserver.chat.repository.ChatParticipantRepository;
 import com.chan.chatserver.chat.repository.ChatRoomRepository;
@@ -149,5 +150,37 @@ public class ChatService {
             }
         }
         return false;
+    }
+
+    public void messageRead(Long roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room can't bean found"));
+        //보낸 사람이 누군지
+        Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
+        List<ReadStatus> readStatuses = readStatusRepository.findByChatRoomAndMember(chatRoom, member);
+        for (ReadStatus readStatus : readStatuses) {
+            readStatus.updateIsRead(true);
+        }
+    }
+
+    public List<MyChatListResDto> getMyChatRooms() {
+        Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findAllByMember(member);
+        return chatParticipants.stream().map(chatParticipant -> {
+            Long count = readStatusRepository.countByChatRoomAndMemberAndIsReadFalse(chatParticipant.getChatRoom(), member);
+            return MyChatListResDto.from(chatParticipant, count);
+        }).toList();
+    }
+
+    public void leaveGroupChatRoom(Long roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room can't bean found"));
+        Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
+        if(chatRoom.getIsGroupChat().equals("N")) throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
+        ChatParticipant participant = chatParticipantRepository.findByChatRoomAndMember(chatRoom, member).orElseThrow(() -> new EntityNotFoundException("participant can't bean found"));
+        chatParticipantRepository.delete(participant);
+
+        List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
+        if(chatParticipants.isEmpty()) {
+            chatRoomRepository.delete(chatRoom);
+        }
     }
 }
