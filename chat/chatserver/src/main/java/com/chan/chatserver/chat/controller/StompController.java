@@ -1,6 +1,7 @@
 package com.chan.chatserver.chat.controller;
 
 import com.chan.chatserver.chat.dto.ChatMessageReqDto;
+import com.chan.chatserver.chat.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,9 +13,11 @@ import org.springframework.stereotype.Controller;
 public class StompController {
 
     private final SimpMessageSendingOperations mssageTemplate;
+    private final ChatService chatService;
 
-    public StompController(SimpMessageSendingOperations mssageTemplate) {
+    public StompController(SimpMessageSendingOperations mssageTemplate, ChatService chatService) {
         this.mssageTemplate = mssageTemplate;
+        this.chatService = chatService;
     }
 
     //    @MessageMapping("/{roomId}") //클라이언트에서 특정 /publish/roomId 형태로 메시지를 발행 시 MessageMapping 수신
@@ -28,6 +31,7 @@ public class StompController {
     @MessageMapping("/{roomId}")
     public void sendMessage(@DestinationVariable Long roomId, ChatMessageReqDto message) {
         log.info("sendMessage: {}", message.getMessage());
+        chatService.saveMessage(roomId, message);
         mssageTemplate.convertAndSend("/topic/" + roomId, message);
     }
 }
