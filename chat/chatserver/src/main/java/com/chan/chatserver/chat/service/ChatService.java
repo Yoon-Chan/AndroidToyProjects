@@ -171,16 +171,41 @@ public class ChatService {
         }).toList();
     }
 
+    //채팅방 나가기
     public void leaveGroupChatRoom(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room can't bean found"));
         Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
-        if(chatRoom.getIsGroupChat().equals("N")) throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
+        if (chatRoom.getIsGroupChat().equals("N")) throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
         ChatParticipant participant = chatParticipantRepository.findByChatRoomAndMember(chatRoom, member).orElseThrow(() -> new EntityNotFoundException("participant can't bean found"));
         chatParticipantRepository.delete(participant);
 
         List<ChatParticipant> chatParticipants = chatParticipantRepository.findByChatRoom(chatRoom);
-        if(chatParticipants.isEmpty()) {
+        if (chatParticipants.isEmpty()) {
             chatRoomRepository.delete(chatRoom);
         }
+    }
+
+    public Long getOrCreatePrivateRoom(Long otherMemberId) {
+        Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
+        Member otherMember = memberRepository.findById(otherMemberId).orElseThrow(() -> new EntityNotFoundException("sender can't bean found"));
+
+        //나와 상대방이 이미 1:1 채팅하고 있으면 해당 roomId return
+        Optional<ChatRoom> chatRoom = chatParticipantRepository.findChatRoomIdExistingPrivateRoom(member.getId(), otherMember.getId());
+
+        if (chatRoom.isPresent()) {
+            return chatRoom.get().getId();
+        }
+
+        //없을 경우 채팅방 개설
+        ChatRoom newRoom = ChatRoom.builder()
+                .isGroupChat("N")
+                .name(member.getName() + " - " + otherMember.getName())
+                .build();
+        chatRoomRepository.save(newRoom);
+
+        //두 사람 모두 참여자로 추가
+        addParticipantToRoom(newRoom, member);
+        addParticipantToRoom(newRoom, otherMember);
+        return newRoom.getId();
     }
 }
