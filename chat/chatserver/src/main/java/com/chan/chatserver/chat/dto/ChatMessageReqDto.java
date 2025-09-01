@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageReqDto {
+    private Long RoomId;
     private String message;
     private String senderEmail;
 
     public static ChatMessageReqDto from(ChatMessage chatMessage) {
         return new ChatMessageReqDto(
+                chatMessage.getChatRoom().getId(),
                 chatMessage.getContent(),
                 chatMessage.getMember().getEmail()
         );

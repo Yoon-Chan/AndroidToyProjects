@@ -2,6 +2,9 @@ package com.chan.chatserver.chat.controller;
 
 import com.chan.chatserver.chat.dto.ChatMessageReqDto;
 import com.chan.chatserver.chat.service.ChatService;
+import com.chan.chatserver.chat.service.RedisPubSubService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,11 +15,11 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class StompController {
 
-    private final SimpMessageSendingOperations mssageTemplate;
+    private final RedisPubSubService pubSubService;
     private final ChatService chatService;
 
-    public StompController(SimpMessageSendingOperations mssageTemplate, ChatService chatService) {
-        this.mssageTemplate = mssageTemplate;
+    public StompController(RedisPubSubService pubSubService, ChatService chatService) {
+        this.pubSubService = pubSubService;
         this.chatService = chatService;
     }
 
@@ -29,9 +32,13 @@ public class StompController {
 //    }
 
     @MessageMapping("/{roomId}")
-    public void sendMessage(@DestinationVariable Long roomId, ChatMessageReqDto message) {
+    public void sendMessage(@DestinationVariable Long roomId, ChatMessageReqDto message) throws JsonProcessingException {
         log.info("sendMessage: {}", message.getMessage());
         chatService.saveMessage(roomId, message);
-        mssageTemplate.convertAndSend("/topic/" + roomId, message);
+//        mssageTemplate.convertAndSend("/topic/" + roomId, message);
+        message.setRoomId(roomId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonMessage = objectMapper.writeValueAsString(message);
+        pubSubService.publish("chat", jsonMessage);
     }
 }

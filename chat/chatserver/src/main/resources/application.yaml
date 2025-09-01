@@ -17,7 +17,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6397
+      port: 6379
 
 jwt:
   secretKey: ${JWT_SECRET_KEY}
