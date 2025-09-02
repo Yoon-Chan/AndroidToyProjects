@@ -1,6 +1,5 @@
-package com.chan.chat_client.ui.theme
+package com.chan.chat_client.presentation.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

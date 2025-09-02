@@ -1,4 +1,4 @@
-package com.chan.chat_client.ui.theme
+package com.chan.chat_client.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

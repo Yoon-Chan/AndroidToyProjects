@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.kotlin.serialization)
+    implementation(libs.androidx.compose.navigation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,5 +63,6 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.kotlin.serialization)
     implementation(libs.bundles.datastore)
+    implementation(libs.bundles.ktor)
     ksp(libs.hilt.android.compiler)
 }
