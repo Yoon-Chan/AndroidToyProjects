@@ -13,12 +13,14 @@ import com.chan.chat_client.presentation.screen.HomeScreen
 import com.chan.chat_client.presentation.screen.LoginScreenRoot
 
 @Composable
-fun MainRouteScreen(modifier: Modifier = Modifier) {
+fun MainRouteScreen(
+    isLogin: Boolean
+) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = Login
+        startDestination = if(isLogin) Home else Login
     ) {
         composable<Login> {
             LoginScreenRoot(

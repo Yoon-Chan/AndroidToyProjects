@@ -71,4 +71,8 @@ class LoginRepositoryImpl @Inject constructor(
                 emit(it.id)
             }
     }
+
+    override fun isLogin(): Flow<Boolean> = flow {
+        emit(sessionStorage.get() != null)
+    }
 }
