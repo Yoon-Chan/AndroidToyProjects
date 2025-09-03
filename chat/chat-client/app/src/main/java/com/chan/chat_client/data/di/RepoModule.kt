@@ -1,6 +1,8 @@
 package com.chan.chat_client.data.di
 
+import com.chan.chat_client.data.repository.ChatRepositoryImpl
 import com.chan.chat_client.data.repository.LoginRepositoryImpl
+import com.chan.chat_client.domain.repository.ChatRepository
 import com.chan.chat_client.domain.repository.LoginRepository
 import dagger.Binds
 import dagger.Module
@@ -15,4 +17,8 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindLoginRepository(repositoryImpl: LoginRepositoryImpl): LoginRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLoginChatRoomRepository(repositoryImpl: ChatRepositoryImpl): ChatRepository
 }

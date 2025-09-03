@@ -69,7 +69,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             }
 
             composable<ChatRoom> {
-                ChatRoomScreen()
+                ChatRoomScreenRoot()
             }
 
             composable<MyPage> {
