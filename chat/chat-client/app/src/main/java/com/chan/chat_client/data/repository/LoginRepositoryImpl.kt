@@ -1,13 +1,17 @@
 package com.chan.chat_client.data.repository
 
 import com.chan.chat_client.data.datastore.SessionStorage
+import com.chan.chat_client.data.mapper.toDomain
 import com.chan.chat_client.data.model.AuthInfoEntity
+import com.chan.chat_client.data.model.UserDto
 import com.chan.chat_client.data.model.dto.CreateMemberRequest
 import com.chan.chat_client.data.model.dto.MemberLoginRequest
 import com.chan.chat_client.data.model.dto.MemberLoginResponse
+import com.chan.chat_client.domain.model.User
 import com.chan.chat_client.domain.repository.LoginRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
@@ -74,5 +78,23 @@ class LoginRepositoryImpl @Inject constructor(
 
     override fun isLogin(): Flow<Boolean> = flow {
         emit(sessionStorage.get() != null)
+    }
+
+    override fun getUsers(): Flow<List<User>> = flow {
+        runCatching {
+            val request = httpClient.get {
+                url("http://10.0.2.2:8080/member/list")
+            }
+
+            request.body<List<UserDto>>()
+        }
+            .onFailure {
+                throw it
+            }
+            .onSuccess {
+                emit(it
+                    .filter { sessionStorage.get()?.email != it.email }
+                    .map { it.toDomain() })
+            }
     }
 }

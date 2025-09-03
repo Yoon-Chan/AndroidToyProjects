@@ -64,15 +64,15 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             navController = navController,
             startDestination = Main
         ) {
-            composable<Main>() {
-                MainScreen()
+            composable<Main> {
+                MainScreenRoot()
             }
 
-            composable<ChatRoom>() {
+            composable<ChatRoom> {
                 ChatRoomScreen()
             }
 
-            composable<MyPage>() {
+            composable<MyPage> {
                 MyPageScreen()
             }
         }
