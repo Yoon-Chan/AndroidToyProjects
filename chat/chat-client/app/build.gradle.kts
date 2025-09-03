@@ -39,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -61,8 +62,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.kotlin.serialization)
     implementation(libs.bundles.datastore)
     implementation(libs.bundles.ktor)
+    implementation(libs.timber)
     ksp(libs.hilt.android.compiler)
 }

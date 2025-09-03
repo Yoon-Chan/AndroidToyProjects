@@ -10,7 +10,7 @@ import com.chan.chat_client.presentation.navigation.Home
 import com.chan.chat_client.presentation.navigation.Login
 import com.chan.chat_client.presentation.screen.ChatDetailScreen
 import com.chan.chat_client.presentation.screen.HomeScreen
-import com.chan.chat_client.presentation.screen.LoginScreen
+import com.chan.chat_client.presentation.screen.LoginScreenRoot
 
 @Composable
 fun MainRouteScreen(modifier: Modifier = Modifier) {
@@ -21,7 +21,15 @@ fun MainRouteScreen(modifier: Modifier = Modifier) {
         startDestination = Login
     ) {
         composable<Login> {
-            LoginScreen()
+            LoginScreenRoot(
+                goHome = {
+                    navController.navigate(Home) {
+                        popUpTo(Login) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
 
         composable<Home> {

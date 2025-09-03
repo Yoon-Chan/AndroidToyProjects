@@ -15,6 +15,8 @@ hilt-plugin = "2.56.2"
 datastore = "1.1.7"
 serialization-plugin = "2.2.10"
 ksp = "2.0.21-1.0.27"
+timber = "5.0.1"
+hilt-compose = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,17 +40,22 @@ ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 
 #hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-plugin" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt-plugin" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-compose" }
 
 
 #datastore
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastore" }
 
-
+#Timber
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -61,7 +68,10 @@ ktor = [
     "ktor-client-core",
     "ktor-client-cio",
     "ktor-serialization-kotlinx-json",
-    "ktor-client-websockets"
+    "ktor-client-websockets",
+    "ktor-client-logging",
+    "ktor-client-auth",
+    "ktor-client-content-negotiation"
 ]
 
 datastore = [
