@@ -35,7 +35,11 @@ fun MainRouteScreen(
         }
 
         composable<Home> {
-            HomeScreen()
+            HomeScreen(
+                onChatDetail = { id ->
+                    navController.navigate(ChatDetail(id))
+                }
+            )
         }
 
         composable<ChatDetail> {

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chan.chat_client.domain.repository.ChatRepository
 import com.chan.chat_client.presentation.model.chatroom.ChatRoomEffect
+import com.chan.chat_client.presentation.model.chatroom.ChatRoomEffect.*
 import com.chan.chat_client.presentation.model.chatroom.ChatRoomEvent
 import com.chan.chat_client.presentation.model.chatroom.ChatRoomState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +30,7 @@ class ChatRoomViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            chatRepository.getMyChatRoom()
+            chatRepository.getGroupChatRoom()
                 .collect { rooms ->
                     _state.update {
                         it.copy(
@@ -60,8 +61,14 @@ class ChatRoomViewModel @Inject constructor(
                                     rooms = it.rooms + room
                                 )
                             }
-                            _effect.send(ChatRoomEffect.ToastMessage("그룹 방이 생성되었습니다."))
+                            _effect.send(ToastMessage("그룹 방이 생성되었습니다."))
                         }
+                }
+            }
+
+            is ChatRoomEvent.OnChatDetail -> {
+                viewModelScope.launch {
+                    _effect.send(ChatRoomEffect.OnChatDetail(event.roomId))
                 }
             }
         }

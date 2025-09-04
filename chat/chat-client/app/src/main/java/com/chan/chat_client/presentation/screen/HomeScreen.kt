@@ -22,7 +22,10 @@ import com.chan.chat_client.presentation.navigation.Main
 import com.chan.chat_client.presentation.navigation.MyPage
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    onChatDetail: (Long) -> Unit
+) {
     val navController = rememberNavController()
     val startDestination = Destination.MAIN
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
@@ -69,7 +72,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             }
 
             composable<ChatRoom> {
-                ChatRoomScreenRoot()
+                ChatRoomScreenRoot(
+                    onChatDetail = onChatDetail
+                )
             }
 
             composable<MyPage> {

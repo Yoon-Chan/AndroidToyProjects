@@ -41,7 +41,8 @@ import com.chan.chat_client.presentation.viewModel.ChatRoomViewModel
 
 @Composable
 fun ChatRoomScreenRoot(
-    viewModel: ChatRoomViewModel = hiltViewModel()
+    viewModel: ChatRoomViewModel = hiltViewModel(),
+    onChatDetail: (Long) -> Unit
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -54,6 +55,8 @@ fun ChatRoomScreenRoot(
                 Toast.makeText(context.applicationContext, effect.message, Toast.LENGTH_SHORT)
                     .show()
             }
+
+            is ChatRoomEffect.OnChatDetail -> onChatDetail(effect.roomId)
         }
     }
 
@@ -113,17 +116,12 @@ fun ChatRoomScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(3f),
                 text = "Room"
             )
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Message"
-            )
-
-            Text(
-                modifier = Modifier.weight(3f),
                 text = "Action"
             )
         }
@@ -137,45 +135,20 @@ fun ChatRoomScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(3f),
                     text = room.roomName
                 )
 
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = "${room.unReadCount}"
-                )
-
-                Row(
-                    modifier = Modifier.weight(3f),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Button(
+                    modifier = Modifier
+                        .weight(1f),
+                    onClick = { onEvent(ChatRoomEvent.OnChatDetail(room.roomId)) },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Blue
+                    )
                 ) {
-                    Button(
-                        modifier = Modifier
-                            .width(80.dp),
-                        onClick = {},
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Blue
-                        )
-                    ) {
-                        Text("입장")
-                    }
-                    Button(
-                        modifier = Modifier.width(100.dp),
-                        onClick = {
-                            if(room.isGroupChat) {
-                                //그룹채팅일 때만 나가기 진행
-                            }
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if(room.isGroupChat) Color.Red else Color.Red.copy(alpha = 0.5f)
-                        )
-                    ) {
-                        Text("나가기")
-                    }
+                    Text("입장")
                 }
             }
         }

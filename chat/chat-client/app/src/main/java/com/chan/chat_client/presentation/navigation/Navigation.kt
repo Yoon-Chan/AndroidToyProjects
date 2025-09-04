@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data object Login
 
 @Serializable
-data object ChatDetail
+data class ChatDetail(val roomId: Long)
 
 @Serializable
 data object Home
