@@ -1,14 +1,13 @@
 package com.chan.chat_client.presentation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.chan.chat_client.presentation.navigation.ChatDetail
 import com.chan.chat_client.presentation.navigation.Home
 import com.chan.chat_client.presentation.navigation.Login
-import com.chan.chat_client.presentation.screen.ChatDetailScreen
+import com.chan.chat_client.presentation.screen.ChatDetailScreenRoot
 import com.chan.chat_client.presentation.screen.HomeScreen
 import com.chan.chat_client.presentation.screen.LoginScreenRoot
 
@@ -20,7 +19,7 @@ fun MainRouteScreen(
 
     NavHost(
         navController = navController,
-        startDestination = if(isLogin) Home else Login
+        startDestination = if (isLogin) Home else Login
     ) {
         composable<Login> {
             LoginScreenRoot(
@@ -43,7 +42,7 @@ fun MainRouteScreen(
         }
 
         composable<ChatDetail> {
-            ChatDetailScreen()
+            ChatDetailScreenRoot()
         }
     }
 }

@@ -3,6 +3,8 @@ package com.chan.chat_client.data.repository
 import com.chan.chat_client.data.mapper.toDomain
 import com.chan.chat_client.data.model.GroupChatRoomDto
 import com.chan.chat_client.data.model.MyChatRoomDto
+import com.chan.chat_client.data.model.dto.ChatMessageResponse
+import com.chan.chat_client.domain.model.ChatMessage
 import com.chan.chat_client.domain.model.GroupChatRoom
 import com.chan.chat_client.domain.model.MyChatRoom
 import com.chan.chat_client.domain.repository.ChatRepository
@@ -70,6 +72,37 @@ class ChatRepositoryImpl @Inject constructor(
             }
             .onSuccess { groupRooms ->
                 emit(groupRooms.map { it.toDomain() })
+            }
+    }
+
+    override fun historyRoomMessage(roomId: Long): Flow<List<ChatMessage>> = flow {
+        runCatching {
+            val request = httpClient.get {
+                url("http://10.0.2.2:8080/chat/history/${roomId}")
+            }
+
+            request.body<List<ChatMessageResponse>>()
+        }
+            .onFailure {
+                throw it
+            }
+            .onSuccess { chatResponse ->
+                emit(chatResponse.map { it.toDomain() })
+            }
+    }
+
+    override fun joinGroupChatRoom(roomId: Long): Flow<Long> = flow {
+        runCatching {
+            val request = httpClient.post {
+                url("http://10.0.2.2:8080/chat/room/group/${roomId}/join")
+            }
+            request.body<Unit>()
+        }
+            .onFailure {
+                throw it
+            }
+            .onSuccess {
+                emit(roomId)
             }
     }
 }

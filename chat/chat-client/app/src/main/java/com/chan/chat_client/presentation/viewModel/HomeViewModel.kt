@@ -2,7 +2,7 @@ package com.chan.chat_client.presentation.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.chan.chat_client.domain.repository.LoginRepository
+import com.chan.chat_client.domain.repository.UserRepository
 import com.chan.chat_client.presentation.model.home.HomeEffect
 import com.chan.chat_client.presentation.model.home.HomeEvent
 import com.chan.chat_client.presentation.model.home.HomeState
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val loginRepository: LoginRepository
+    private val userRepository: UserRepository
 ): ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state = _state.asStateFlow()
@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            loginRepository.getUsers().collect { users ->
+            userRepository.getUsers().collect { users ->
                 _state.update {
                     it.copy(users = users)
                 }

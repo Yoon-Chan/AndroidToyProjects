@@ -79,22 +79,4 @@ class LoginRepositoryImpl @Inject constructor(
     override fun isLogin(): Flow<Boolean> = flow {
         emit(sessionStorage.get() != null)
     }
-
-    override fun getUsers(): Flow<List<User>> = flow {
-        runCatching {
-            val request = httpClient.get {
-                url("http://10.0.2.2:8080/member/list")
-            }
-
-            request.body<List<UserDto>>()
-        }
-            .onFailure {
-                throw it
-            }
-            .onSuccess {
-                emit(it
-                    .filter { sessionStorage.get()?.email != it.email }
-                    .map { it.toDomain() })
-            }
-    }
 }

@@ -17,6 +17,7 @@ serialization-plugin = "2.2.10"
 ksp = "2.0.21-1.0.27"
 timber = "5.0.1"
 hilt-compose = "1.2.0"
+krossbow ="7.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,12 @@ kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-j
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-content-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+
+#krossbow
+krossbow-stomp-core = { module = "org.hildan.krossbow:krossbow-stomp-core", version.ref = "krossbow" }
+krossbow-websocket-builtin = { module = "org.hildan.krossbow:krossbow-websocket-builtin", version.ref = "krossbow" }
+krossbow-websocket-ktor = { module = "org.hildan.krossbow:krossbow-websocket-ktor", version.ref = "krossbow" }
 
 #hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-plugin" }
@@ -71,10 +78,17 @@ ktor = [
     "ktor-client-websockets",
     "ktor-client-logging",
     "ktor-client-auth",
-    "ktor-client-content-negotiation"
+    "ktor-client-content-negotiation",
+    "ktor-client-content-okhttp"
 ]
 
 datastore = [
     "datastore-preferences",
     "datastore-core"
+]
+
+krossbow = [
+    "krossbow-stomp-core",
+    "krossbow-websocket-builtin",
+    "krossbow-websocket-ktor"
 ]

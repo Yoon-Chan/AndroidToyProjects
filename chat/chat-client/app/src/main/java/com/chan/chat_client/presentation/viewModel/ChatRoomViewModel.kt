@@ -68,7 +68,13 @@ class ChatRoomViewModel @Inject constructor(
 
             is ChatRoomEvent.OnChatDetail -> {
                 viewModelScope.launch {
-                    _effect.send(ChatRoomEffect.OnChatDetail(event.roomId))
+                    chatRepository.joinGroupChatRoom(event.roomId)
+                        .catch {
+                            Timber.e("onEvent ChatRoomEvent.OnChatDetail: $it")
+                        }
+                        .collect {
+                            _effect.send(ChatRoomEffect.OnChatDetail(event.roomId))
+                        }
                 }
             }
         }

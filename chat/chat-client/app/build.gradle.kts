@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.kotlin.serialization)
     implementation(libs.bundles.datastore)
     implementation(libs.bundles.ktor)
+    implementation(libs.bundles.krossbow)
     implementation(libs.timber)
     ksp(libs.hilt.android.compiler)
 }
