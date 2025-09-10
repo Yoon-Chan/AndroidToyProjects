@@ -17,3 +17,27 @@ LaunchedEffect를 이용해 자동 화면 이동 구현
 graphicsLayer을 이용해 현재 페이지 기준 화면 회전 및 투명도 설정
 
 <img src="https://github.com/user-attachments/assets/dc9189e4-aac3-4a2c-a065-87ce9fc42813" witdh=300 height=500 />
+
+
+---
+
+##2. 채팅 기능 구현
+
+### 사용한 라이브러리
++ Compose UI
++ Ktor
++ Krossbow
++ Hilt
++ dataStore
++ serialization
++ ksp
++ timber
+
+### 주요 기능
+
+#### 1. 로그인 기능 구현(accessToken 발급)
+#### 2. 채팅 기능 구현
+
+|채팅1|채팅2|
+|:--:|:--:|
+|![chat1](https://github.com/user-attachments/assets/3b7dbe09-8cc1-4a1e-976b-54eafb3ecade)|![chat2](https://github.com/user-attachments/assets/0a1907f6-2df6-4917-a64a-0f5348f4bb7b)|
