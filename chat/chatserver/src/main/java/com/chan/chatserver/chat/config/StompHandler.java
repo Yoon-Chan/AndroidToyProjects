@@ -49,12 +49,12 @@ public class StompHandler implements ChannelInterceptor {
             log.info("토큰 검증 완료");
         }
 
-        if(StompCommand.CONNECT == accessor.getCommand()) {
+        if(StompCommand.SUBSCRIBE == accessor.getCommand()) {
             log.info("subscribe 검증");
             String bearerToken = accessor.getFirstNativeHeader("Authorization");
             Key key = new SecretKeySpec(java.util.Base64.getDecoder().decode(secretKey), SignatureAlgorithm.HS512.getJcaName());
             String jwtToken = bearerToken.substring(7);
-
+            log.info("subscribe 검증 완료 token : {} ", jwtToken);
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
@@ -62,6 +62,7 @@ public class StompHandler implements ChannelInterceptor {
                     .getBody();
             String email = claims.getSubject();
             String roomId = accessor.getDestination().split("/")[2];
+            log.info("subscribe 검증 완료 email : {}, roomId : {}", email, roomId);
             if(!chatService.isRoomParticipant(email, Long.parseLong(roomId))) {
                 throw new AuthenticationServiceException("해당 room의 권한이 없습니다");
             }

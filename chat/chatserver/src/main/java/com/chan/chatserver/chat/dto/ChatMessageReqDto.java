@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageReqDto {
-    private Long RoomId;
+    private Long roomId;
     private String message;
     private String senderEmail;
 

@@ -71,7 +71,7 @@ public class ChatService {
         }
     }
 
-    public void creatGroupRoom(String roomName) {
+    public Long creatGroupRoom(String roomName) {
         Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() -> new EntityNotFoundException("member can't bean found"));
 
@@ -88,6 +88,7 @@ public class ChatService {
                 .member(member)
                 .build();
         chatParticipantRepository.save(chatParticipant);
+        return chatRoom.getId();
     }
 
     public List<ChatRoomListResDto> getGroupChatRooms() {
