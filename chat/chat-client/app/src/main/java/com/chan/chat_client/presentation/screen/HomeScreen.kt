@@ -78,7 +78,7 @@ fun HomeScreen(
             }
 
             composable<MyPage> {
-                MyPageScreen()
+                MyPageScreenRoot()
             }
         }
     }
