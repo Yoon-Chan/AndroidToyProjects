@@ -13,7 +13,7 @@ fun ActionIcon(
     modifier: Modifier = Modifier,
     backgroundColor: Color,
     icon: ImageVector,
-    tint: Color,
+    tint: Color = Color.White,
     contentDescription: String? = null,
     onClick: () -> Unit,
 ) {

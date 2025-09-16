@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -44,7 +45,7 @@ fun SwipeableItemWithActions(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(isRevealed, contextMenuWidth) {
-        if(isRevealed) {
+        if (isRevealed) {
             offset.animateTo(contextMenuWidth)
         } else {
             offset.animateTo(0f)
@@ -56,17 +57,18 @@ fun SwipeableItemWithActions(
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
     ) {
-        Row(modifier = Modifier
-            .onSizeChanged {
-                contextMenuWidth = it.width.toFloat()
-            },
+        Row(
+            modifier = Modifier
+                .onSizeChanged {
+                    contextMenuWidth = it.width.toFloat()
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             actions()
         }
         Surface(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .offset { IntOffset(offset.value.roundToInt(), 0) }
                 .pointerInput(contextMenuWidth) {
                     detectHorizontalDragGestures(
@@ -80,9 +82,10 @@ fun SwipeableItemWithActions(
                         onDragEnd = {
                             when {
                                 offset.value >= contextMenuWidth / 2f -> {
-                                    scope.launch{ offset.animateTo(contextMenuWidth) }
+                                    scope.launch { offset.animateTo(contextMenuWidth) }
                                     onExpanded()
                                 }
+
                                 else -> {
                                     scope.launch {
                                         offset.animateTo(0f)
