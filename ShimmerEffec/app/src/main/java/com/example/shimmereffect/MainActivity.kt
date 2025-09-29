@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,33 +44,37 @@ class MainActivity : ComponentActivity() {
                 isLoading = false
             }
             ShimmerEffectTheme {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    items(20) {
-                        ShimmerListItem(
-                            isLoading = isLoading,
-                            contentAfterLoading = {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Home,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(100.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Text(
-                                        text = "This is a long text to show that our shimmer display" +
-                                                "is looking perfectly fine"
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                Scaffold { innerPadding ->
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(20) {
+                            ShimmerListItem(
+                                isLoading = isLoading,
+                                contentAfterLoading = {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Home,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(100.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Text(
+                                            text = "This is a long text to show that our shimmer display" +
+                                                    "is looking perfectly fine"
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }

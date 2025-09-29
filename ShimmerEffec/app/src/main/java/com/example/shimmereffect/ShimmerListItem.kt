@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -36,6 +37,7 @@ fun ShimmerListItem(
     if(isLoading) {
         Row(
             modifier = modifier
+                .padding(16.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -54,7 +56,7 @@ fun ShimmerListItem(
                         .height(20.dp)
                         .shimmerEffect()
                 )
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.height(16.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
