@@ -59,6 +59,9 @@ fun SwipeableItemWithActions(
     ) {
         Row(
             modifier = Modifier
+                .onGloballyPositioned {
+
+                }
                 .onSizeChanged {
                     contextMenuWidth = it.width.toFloat()
                 },
