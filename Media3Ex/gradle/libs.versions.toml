@@ -8,6 +8,9 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.11.0"
 composeBom = "2024.09.00"
+circuit = "0.30.0"
+ksp = "2.0.21-1.0.27"
+hilt = "2.57.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,8 +28,27 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 
+#circuit 라이브러리
+slack-circuit = { module = "com.slack.circuit:circuit-foundation", version.ref = "circuit"}
+slack-circuit-android = { module = "com.slack.circuit:circuitx-android", version.ref = "circuit"}
+slack-circuit-runtime = { module = "com.slack.circuit:circuit-runtime", version.ref = "circuit"}
+slack-circuit-codegen-annotations = { module = "com.slack.circuit:circuit-codegen-annotations", version.ref = "circuit"}
+slack-circuit-codegen = { module = "com.slack.circuit:circuit-codegen", version.ref = "circuit"}
+
+#hilt
+dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"}
+dagger-hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt"}
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref="ksp"}
+hilt-plugin = {id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 
+[bundles]
+circuit = [
+    "slack-circuit",
+    "slack-circuit-android",
+    "slack-circuit-runtime"
+]
