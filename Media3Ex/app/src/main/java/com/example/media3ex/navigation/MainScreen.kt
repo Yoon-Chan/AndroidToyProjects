@@ -8,5 +8,10 @@ import kotlinx.parcelize.Parcelize
 data object MainScreen : Screen {
     data class State(
         val id: Int,
+        val eventSink: (MainEvent) -> Unit
     ): CircuitUiState
+}
+
+sealed interface MainEvent {
+
 }
