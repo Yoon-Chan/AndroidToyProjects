@@ -13,5 +13,6 @@ data object MainScreen : Screen {
 }
 
 sealed interface MainEvent {
-
+    data object Increase: MainEvent
+    data object Decrease: MainEvent
 }

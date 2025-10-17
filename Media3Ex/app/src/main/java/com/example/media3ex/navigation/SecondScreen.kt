@@ -13,5 +13,6 @@ data object SecondScreen : Screen {
 }
 
 sealed interface SecondEvent {
-
+    data object Increase: SecondEvent
+    data object Decrease: SecondEvent
 }
