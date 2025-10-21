@@ -1,16 +1,33 @@
 package com.example.media3ex.presentation
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.media3ex.navigation.MainEvent
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
+import com.example.media3ex.component.TopbarNestedScrollController
+import com.example.media3ex.component.YoutubeItem
+import com.example.media3ex.component.YoutubeTopbar
 import com.example.media3ex.navigation.MainScreen
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.runtime.ui.Ui
@@ -19,25 +36,60 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 @CircuitInject(MainScreen::class, ActivityRetainedComponent::class)
 class MainUi : Ui<MainScreen.State> {
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content(
         state: MainScreen.State,
         modifier: Modifier
     ) {
+        val density = LocalDensity.current
+        var offsetY by remember {
+            mutableStateOf(0.dp)
+        }
+        val statusBarDp = StatusBarHeightDp()
+
+        val nestedScroll = remember {
+            TopbarNestedScrollController { x, y ->
+                val value = with(density) { y.toDp() }
+                if(offsetY + value <= ((-56).dp - statusBarDp -  16.dp)) {
+                    offsetY = ((-56).dp - statusBarDp -  16.dp)
+                } else {
+                    offsetY = min( offsetY + value, 0.dp)
+                }
+            }
+        }
+
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(color = Color.Yellow)
-                .clickable {
-                    state.eventSink(MainEvent.Increase)
-                },
-            contentAlignment = Alignment.Center
+                .background(color = Color.White)
         ) {
-            Text(
-                text = "${state.id}"
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(nestedScroll)
+            ) {
+                items(10) {
+                    YoutubeItem()
+                }
+            }
+
+            YoutubeTopbar(
+                modifier = Modifier
+                    .offset(x = 0.dp, y = offsetY),
             )
         }
+
     }
+}
+
+@Composable
+fun StatusBarHeightDp(): Dp {
+    val density = LocalDensity.current
+    val insets = WindowInsets.statusBars
+    val topPx = insets.getTop(density) // px 단위
+    return with(density) { topPx.toDp() } // Dp로 변환
 }
 
 
