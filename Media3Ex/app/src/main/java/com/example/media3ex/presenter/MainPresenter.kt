@@ -10,9 +10,10 @@ import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.retained.rememberRetained
 import com.slack.circuit.runtime.presenter.Presenter
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Inject
 
 @CircuitInject(MainScreen::class, SingletonComponent::class)
-class MainPresenter: Presenter<MainScreen.State> {
+class MainPresenter @Inject constructor(): Presenter<MainScreen.State> {
 
     @Composable
     override fun present(): MainScreen.State {

@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.media3ex.navigation.MainEvent
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.media3ex.navigation.SecondEvent
 import com.example.media3ex.navigation.SecondScreen
 import com.slack.circuit.codegen.annotations.CircuitInject
@@ -37,4 +37,11 @@ class SecondUi(): Ui<SecondScreen.State> {
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun MainScreenPreview() {
+    val state = SecondScreen.State(id = 1) {}
+    SecondUi().Content(state, modifier = Modifier)
 }

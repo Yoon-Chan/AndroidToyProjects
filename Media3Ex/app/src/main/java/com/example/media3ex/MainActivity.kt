@@ -63,7 +63,6 @@ class MainActivity : ComponentActivity() {
                 )
 
                 CircuitCompositionLocals(circuit = circuit) {
-                    val circuitLocal = LocalCircuit.current
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
                         bottomBar = {
@@ -74,15 +73,10 @@ class MainActivity : ComponentActivity() {
                                     NavigationBarItem(
                                         selected = screen == currentBottomScreen,
                                         onClick = {
-//                                            navigator.popUntil {
-//                                                it == screen
-//                                            }
                                             if(currentBottomScreen != screen) {
                                                 currentBottomScreen = screen
                                                 navigator.resetRoot(
                                                     screen,
-                                                    saveState = true,
-                                                    restoreState = true
                                                 )
                                             }
                                         },
