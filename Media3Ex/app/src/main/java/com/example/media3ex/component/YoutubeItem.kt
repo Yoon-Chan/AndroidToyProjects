@@ -1,6 +1,7 @@
 package com.example.media3ex.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +17,10 @@ import androidx.compose.ui.unit.dp
 import com.example.media3ex.ui.theme.Media3ExTheme
 
 @Composable
-fun YoutubeItem(modifier: Modifier = Modifier) {
+fun YoutubeItem(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -26,6 +30,7 @@ fun YoutubeItem(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .aspectRatio(16/9f)
                 .background(color = Color.LightGray)
+                .clickable(onClick = onClick)
         )
         Row(
             modifier = Modifier
@@ -44,6 +49,8 @@ fun YoutubeItem(modifier: Modifier = Modifier) {
 @Composable
 private fun YoutubeItemPreview() {
     Media3ExTheme {
-        YoutubeItem()
+        YoutubeItem(
+            onClick = {}
+        )
     }
 }

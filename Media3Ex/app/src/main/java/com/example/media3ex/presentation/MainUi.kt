@@ -1,15 +1,13 @@
 package com.example.media3ex.presentation
 
 import android.annotation.SuppressLint
-import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -28,6 +26,8 @@ import androidx.compose.ui.unit.min
 import com.example.media3ex.component.TopbarNestedScrollController
 import com.example.media3ex.component.YoutubeItem
 import com.example.media3ex.component.YoutubeTopbar
+import com.example.media3ex.localprovider.LocalChromeController
+import com.example.media3ex.navigation.MainEvent
 import com.example.media3ex.navigation.MainScreen
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.runtime.ui.Ui
@@ -71,7 +71,11 @@ class MainUi : Ui<MainScreen.State> {
                     .nestedScroll(nestedScroll)
             ) {
                 items(10) {
-                    YoutubeItem()
+                    YoutubeItem(
+                        onClick = {
+                            state.eventSink(MainEvent.OnDetail(it.toLong()))
+                        }
+                    )
                 }
             }
 
@@ -81,6 +85,18 @@ class MainUi : Ui<MainScreen.State> {
             )
         }
 
+//        AnimatedVisibility(
+//            visible = isDetail,
+//            enter = slideInVertically { it } ,
+//            exit = slideOutVertically { it }
+//        ) {
+//            DetailUi(DetailScreen.State(0) {})
+////            Box(
+////                modifier = Modifier
+////                    .fillMaxSize()
+////                    .background(color = Color.Magenta)
+////            )
+//        }
     }
 }
 

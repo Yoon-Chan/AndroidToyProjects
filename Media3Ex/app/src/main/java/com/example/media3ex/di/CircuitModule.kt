@@ -1,11 +1,11 @@
 package com.example.media3ex.di
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import com.example.media3ex.navigation.MediaScreen
 import com.example.media3ex.navigation.MainScreen
 import com.example.media3ex.navigation.SecondScreen
 import com.slack.circuit.foundation.Circuit
@@ -43,7 +43,8 @@ abstract class CircuitModule {
             .addUiFactories(uiFactories)
             .addAnimatedScreenTransforms(
                 MainScreen::class to CustomScreenNoneAnimatedTransform,
-                SecondScreen::class to CustomScreenNoneAnimatedTransform
+                SecondScreen::class to CustomScreenNoneAnimatedTransform,
+                MediaScreen::class to CustomScreenSlideHorizonAnimatedTransform
             )
             .build()
     }
@@ -71,7 +72,7 @@ object CustomScreenSlideHorizonAnimatedTransform : AnimatedScreenTransform {
     override fun AnimatedContentTransitionScope<AnimatedNavState>.enterTransition(
         animatedNavEvent: AnimatedNavEvent
     ): EnterTransition? {
-        return slideInHorizontally()
+        return slideInHorizontally { it }
     }
 
     override fun AnimatedContentTransitionScope<AnimatedNavState>.exitTransition(
