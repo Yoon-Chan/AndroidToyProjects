@@ -33,13 +33,15 @@ class MixingMusicViewModel @Inject constructor(
         when(event) {
 
             is MixingMusicEvent.OnChangeMedia -> _state.update { it.copy(mediaUri = event.mediaUri) }
+            is MixingMusicEvent.OnChangeMedia2 -> _state.update { it.copy(mediaUri2 = event.mediaUri2) }
             is MixingMusicEvent.OnChangeMusic -> _state.update { it.copy(musicUri = event.musicUri) }
             MixingMusicEvent.OnClickMixing -> {
                 viewModelScope.launch {
                     val mediaUri = state.value.mediaUri
+                    val mediaUri2 = state.value.mediaUri2
                     val musicUri = state.value.musicUri
-                    if(mediaUri == null || musicUri == null) return@launch
-                    mediaTransfer.startTransferMixingMusic(mediaUri, musicUri)
+                    if(mediaUri == null || musicUri == null || mediaUri2 == null) return@launch
+                    mediaTransfer.startTransferMixingMusic(mediaUri, mediaUri2,musicUri)
                         .catch {
                             Log.e("vsvx13", "OnClickMixing error $it")
                         }

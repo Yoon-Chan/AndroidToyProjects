@@ -1,6 +1,5 @@
 package com.example.mediaeditex.presentation
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -10,7 +9,9 @@ import androidx.navigation.toRoute
 import com.example.mediaeditex.presentation.mixing.MixingMusicScreenRoot
 import com.example.mediaeditex.presentation.navigation.Main
 import com.example.mediaeditex.presentation.navigation.MixingMusic
+import com.example.mediaeditex.presentation.navigation.RecordMedia
 import com.example.mediaeditex.presentation.navigation.ResultMedia
+import com.example.mediaeditex.presentation.record.RecordMediaScreenRoot
 import com.example.mediaeditex.presentation.result.ResultScreenRoot
 
 @Composable
@@ -18,13 +19,15 @@ fun MediaNavigation(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
     NavHost(
-        modifier = modifier,
         navController = navController,
         startDestination = Main
     ) {
         composable<Main> {
             StartScreenRoot(
-                onClickMixingMusic = { navController.navigate(MixingMusic)}
+                onClickMixingMusic = { navController.navigate(MixingMusic)},
+                onClickRecordingVideo = {
+                    navController.navigate(RecordMedia)
+                }
             )
         }
 
@@ -41,6 +44,10 @@ fun MediaNavigation(modifier: Modifier = Modifier) {
             ResultScreenRoot(
                 uri = data.uri
             )
+        }
+
+        composable<RecordMedia> {
+            RecordMediaScreenRoot()
         }
     }
 }
