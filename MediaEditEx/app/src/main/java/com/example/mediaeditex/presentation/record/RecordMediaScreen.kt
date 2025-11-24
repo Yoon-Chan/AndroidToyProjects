@@ -1,10 +1,8 @@
 package com.example.mediaeditex.presentation.record
 
-import android.graphics.Bitmap
-import android.graphics.Matrix
+import android.Manifest
+import android.content.pm.PackageManager
 import android.widget.Toast
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageProxy
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoRecordEvent
@@ -12,8 +10,11 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.camera.view.video.AudioConfig
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,10 +23,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +45,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.decodeToImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -44,9 +56,11 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.mediaeditex.domain.VideoInfo
 import com.example.mediaeditex.presentation.record.model.RecordMediaEvent
 import com.example.mediaeditex.presentation.record.model.RecordMediaState
 import com.example.mediaeditex.presentation.util.ObserveAsEvents
+import com.example.mediaeditex.presentation.util.toTime
 import java.io.File
 import java.time.Instant
 
@@ -70,13 +84,19 @@ fun RecordMediaScreenRoot(
         state = state,
         onClickRecorder = { controller ->
             if (recording != null) {
-                viewModel.onEvent(RecordMediaEvent.StopRecord)
                 recording?.stop()
                 recording = null
                 return@RecordMediaScreen
             }
 
-            val outputFile = File(context.cacheDir, "my-recording-${Instant.now().epochSecond}.mp4")
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) return@RecordMediaScreen
+
+            val fileName = "my-recording-${Instant.now().epochSecond}.mp4"
+            val outputFile = File(context.cacheDir, fileName)
             recording = controller.startRecording(
                 FileOutputOptions.Builder(outputFile).build(),
                 AudioConfig.create(true),
@@ -90,16 +110,18 @@ fun RecordMediaScreenRoot(
                             recording = null
                         } else {
                             Toast.makeText(context, "녹화 성공", Toast.LENGTH_SHORT).show()
+                            viewModel.onEvent(RecordMediaEvent.StopRecord)
                         }
                     }
 
                     is VideoRecordEvent.Start -> {
                         Toast.makeText(context, "녹화 시작", Toast.LENGTH_SHORT).show()
-                        viewModel.onEvent(RecordMediaEvent.StartRecord)
+                        viewModel.onEvent(RecordMediaEvent.StartRecord(fileName))
                     }
                 }
             }
-        }
+        },
+        onEvent = viewModel::onEvent
     )
 }
 
@@ -107,7 +129,8 @@ fun RecordMediaScreenRoot(
 fun RecordMediaScreen(
     modifier: Modifier = Modifier,
     state: RecordMediaState,
-    onClickRecorder: (LifecycleCameraController) -> Unit
+    onClickRecorder: (LifecycleCameraController) -> Unit,
+    onEvent: (RecordMediaEvent) -> Unit,
 ) {
     val context = LocalContext.current.applicationContext
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -136,6 +159,10 @@ fun RecordMediaScreen(
                         this.controller = controller
                         controller.bindToLifecycle(lifecycleOwner)
                     }
+                },
+                update = {
+                    it.controller = controller
+                    controller.bindToLifecycle(lifecycleOwner)
                 }
             )
 
@@ -145,7 +172,7 @@ fun RecordMediaScreen(
                     .padding(bottom = 16.dp)
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(color = if(state.isRecord) Color.Red else Color.White)
+                    .background(color = if (state.isRecord) Color.Red else Color.White)
                     .clickable {
                         onClickRecorder(controller)
                     }
@@ -155,13 +182,18 @@ fun RecordMediaScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(150.dp)
                 .background(color = Color.Black)
                 .navigationBarsPadding()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "00:04 / 04:00"
+                text = "${state.recordTime.toTime()} / ${state.resTime.toTime()}",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -170,13 +202,16 @@ fun RecordMediaScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
+                Row(
                     modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.Center
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "이미지 리스트들"
-                    )
+                    state.videos.forEach { videoInfo ->
+                        VideoCard(
+                            videoInfo = videoInfo,
+                            onDelete = { onEvent(RecordMediaEvent.DeleteVideo(videoInfo)) }
+                        )
+                    }
                 }
 
                 Button(
@@ -191,8 +226,55 @@ fun RecordMediaScreen(
     }
 }
 
-private fun recordVideo(controller: LifecycleCameraController) {
+@Composable
+fun VideoCard(modifier: Modifier = Modifier, videoInfo: VideoInfo, onDelete: (String) -> Unit) {
+    when (videoInfo) {
+        is VideoInfo.Done -> {
+            Box(
+                modifier = modifier
+                    .size(60.dp)
+                    .padding(8.dp)
+            ) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    bitmap = videoInfo.video.thumbnail.decodeToImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                )
 
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(8.dp, (-8).dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.LightGray, CircleShape)
+                        .background(Color.Transparent),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(onClick = { onDelete(videoInfo.video.url) }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            tint = Color.LightGray
+                        )
+                    }
+                }
+            }
+        }
+
+        is VideoInfo.Loading -> {
+            Box(
+                modifier = modifier
+                    .size(60.dp)
+                    .padding(8.dp)
+                    .border(1.dp, Color.LightGray, RoundedCornerShape(4.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+    }
 }
 
 @Preview
@@ -200,6 +282,7 @@ private fun recordVideo(controller: LifecycleCameraController) {
 fun RecordMediaScreenPreview() {
     RecordMediaScreen(
         state = RecordMediaState(),
-        onClickRecorder = {}
+        onClickRecorder = {},
+        onEvent = {}
     )
 }

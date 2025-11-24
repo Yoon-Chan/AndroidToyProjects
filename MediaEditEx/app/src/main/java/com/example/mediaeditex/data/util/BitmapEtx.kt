@@ -1,4 +1,4 @@
-package com.example.mediaeditex.presentation.util
+package com.example.mediaeditex.data.util
 
 import android.graphics.Bitmap
 import java.io.ByteArrayOutputStream

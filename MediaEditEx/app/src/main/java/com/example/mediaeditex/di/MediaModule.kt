@@ -19,4 +19,8 @@ object MediaModule {
     fun provideMediaTransfer(@ApplicationContext context: Context): MediaTransfer {
         return AndroidMediaTransfer(context)
     }
+
+    @Provides
+    @Singleton
+    fun providesContext(@ApplicationContext context: Context) = context
 }
