@@ -3,15 +3,20 @@ package com.example.mediaeditex.data
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.util.Log
+import androidx.core.net.toUri
 import com.example.mediaeditex.data.util.toByteArray
 import com.example.mediaeditex.domain.RecordRepository
 import com.example.mediaeditex.domain.Video
+import com.example.mediaeditex.domain.VideoCutInfo
 import com.example.mediaeditex.domain.VideoInfo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.ceil
 
 class RecordRepositoryImpl @Inject constructor(
     private val context: Context
@@ -52,9 +57,13 @@ class RecordRepositoryImpl @Inject constructor(
                     retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 }"
             )
+
+            val width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
+            val height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
+
             Log.e(
                 "vsvx13",
-                "path=${file.absolutePath}, exists=${file.exists()}, length=${file.length()}"
+                "path=${file.absolutePath}, exists=${file.exists()}, length=${file.length()} width=${width}, height=${height}"
             )
             if (bitmap == null) throw RuntimeException("bitmap is Null")
 
@@ -69,6 +78,45 @@ class RecordRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             //TODO: 오류 관련 처리 IllegalArgumentException, SecurityException
+            throw e
+        } finally {
+            retriever.release()
+        }
+    }
+
+    override suspend fun getThumbnailInfo(url: String): Result<VideoCutInfo> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                getThumbnails(context, url)
+            }
+        }
+    }
+
+    private fun getThumbnails(
+        context: Context,
+        url: String,
+    ): VideoCutInfo {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            retriever.setDataSource(context, url.toUri())
+
+            val duration =
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()
+                    ?: throw RuntimeException("오류1")
+
+            val thumbnails = (0..ceil(duration.toDouble() / 1000).toInt()).map { index ->
+                val time = (1000L * index).coerceAtMost(duration)
+                val bitmap = retriever.getFrameAtTime(time * 1000) ?: throw RuntimeException("오류2")
+                bitmap.toByteArray()
+            }
+
+            VideoCutInfo(
+                url = url,
+                duration = duration,
+                thumbnails = thumbnails
+            )
+        } catch (e: Exception) {
+            Log.e("vsvx13", "${e.message}")
             throw e
         } finally {
             retriever.release()

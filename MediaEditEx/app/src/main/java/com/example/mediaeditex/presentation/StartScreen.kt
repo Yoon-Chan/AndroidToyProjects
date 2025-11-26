@@ -29,7 +29,8 @@ import com.example.mediaeditex.presentation.ui.theme.MediaEditExTheme
 @Composable
 fun StartScreenRoot(
     onClickMixingMusic: () -> Unit,
-    onClickRecordingVideo: () -> Unit
+    onClickRecordingVideo: () -> Unit,
+    onClickVideoCut: () -> Unit,
 ) {
     val context = LocalContext.current
     val permissions = mutableListOf(
@@ -77,6 +78,14 @@ fun StartScreenRoot(
                 text = "동영상 촬영하기"
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = onClickVideoCut) {
+            Text(
+                text = "동영상 자르기"
+            )
+        }
     }
 }
 
@@ -95,7 +104,8 @@ private fun StartScreenPreview() {
     MediaEditExTheme {
         StartScreenRoot(
             onClickMixingMusic = {},
-            onClickRecordingVideo = {}
+            onClickRecordingVideo = {},
+            onClickVideoCut = {}
         )
     }
 }

@@ -11,8 +11,10 @@ import com.example.mediaeditex.presentation.navigation.Main
 import com.example.mediaeditex.presentation.navigation.MixingMusic
 import com.example.mediaeditex.presentation.navigation.RecordMedia
 import com.example.mediaeditex.presentation.navigation.ResultMedia
+import com.example.mediaeditex.presentation.navigation.VideoCut
 import com.example.mediaeditex.presentation.record.RecordMediaScreenRoot
 import com.example.mediaeditex.presentation.result.ResultScreenRoot
+import com.example.mediaeditex.presentation.videocut.VideoCutScreenRoot
 
 @Composable
 fun MediaNavigation(modifier: Modifier = Modifier) {
@@ -27,6 +29,9 @@ fun MediaNavigation(modifier: Modifier = Modifier) {
                 onClickMixingMusic = { navController.navigate(MixingMusic)},
                 onClickRecordingVideo = {
                     navController.navigate(RecordMedia)
+                },
+                onClickVideoCut = {
+                    navController.navigate(VideoCut)
                 }
             )
         }
@@ -48,6 +53,10 @@ fun MediaNavigation(modifier: Modifier = Modifier) {
 
         composable<RecordMedia> {
             RecordMediaScreenRoot()
+        }
+
+        composable<VideoCut> {
+            VideoCutScreenRoot()
         }
     }
 }
