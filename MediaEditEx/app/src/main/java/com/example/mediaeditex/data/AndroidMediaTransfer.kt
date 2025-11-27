@@ -32,9 +32,13 @@ import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import com.example.mediaeditex.domain.MediaTransfer
 import com.example.mediaeditex.domain.TransferState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 @OptIn(UnstableApi::class)
@@ -244,6 +248,58 @@ class AndroidMediaTransfer @Inject constructor(
             0L
         } finally {
             retriever.release()
+        }
+    }
+
+    override suspend fun editCutVideo(
+        url: String,
+        startPosition: Long,
+        endPosition: Long
+    ): Flow<String> = callbackFlow {
+        val path = "${context.cacheDir.absolutePath}/${System.currentTimeMillis()}.mp4"
+        val transformerListener: Transformer.Listener =
+            object : Transformer.Listener {
+                override fun onCompleted(composition: Composition, result: ExportResult) {
+                    Log.e("vsvx13", "onCompleted : $composition ${result.videoEncoderName}")
+                    trySend(path)
+                    close()
+                }
+
+                override fun onError(
+                    composition: Composition, result: ExportResult,
+                    exception: ExportException
+                ) {
+                    close(exception)
+                }
+            }
+        transformer.addListener(transformerListener)
+
+        val inputMediaItem = MediaItem.Builder()
+            .setUri(url.toUri())
+            .setClippingConfiguration(
+                MediaItem.ClippingConfiguration.Builder()
+                    .setStartPositionMs(startPosition)
+                    .setEndPositionMs(endPosition)
+                    .build())
+            .build()
+
+//        val editedMediaItem = EditedMediaItem.Builder(inputMediaItem)
+//            .set
+//            .build()
+
+        transformer.start(inputMediaItem, path)
+//        val progressHolder = ProgressHolder()
+//        var progressState = transformer.getProgress(progressHolder)
+//        while (progressState != Transformer.PROGRESS_STATE_NOT_STARTED) {
+//            delay(200L)
+//            progressState = transformer.getProgress(progressHolder)
+//            if (progressState != Transformer.PROGRESS_STATE_NOT_STARTED) {
+//                trySend(TransferState.Progress(progressHolder.progress))
+//            }
+//        }
+
+        awaitClose {
+            transformer.removeListener(transformerListener)
         }
     }
 }

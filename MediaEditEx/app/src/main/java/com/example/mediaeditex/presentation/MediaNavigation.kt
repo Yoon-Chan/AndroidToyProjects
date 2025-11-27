@@ -56,7 +56,11 @@ fun MediaNavigation(modifier: Modifier = Modifier) {
         }
 
         composable<VideoCut> {
-            VideoCutScreenRoot()
+            VideoCutScreenRoot(
+                onNavigateResult = {
+                    navController.navigate(ResultMedia(it))
+                }
+            )
         }
     }
 }
