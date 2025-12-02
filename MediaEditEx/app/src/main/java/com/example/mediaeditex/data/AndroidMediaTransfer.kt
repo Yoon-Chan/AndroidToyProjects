@@ -41,25 +41,26 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-@OptIn(UnstableApi::class)
+@UnstableApi
 class AndroidMediaTransfer @Inject constructor(
     private val context: Context,
 ) : MediaTransfer {
 
     private val transformer = Transformer.Builder(context)
-        .setVideoMimeType(MimeTypes.VIDEO_H264)
+        .setVideoMimeType(MimeTypes.VIDEO_MP4)
         .setUsePlatformDiagnostics(true)
         .build()
 
     override suspend fun startTransfer(url: String, text: String): Flow<TransferState> =
-        channelFlow {
+        callbackFlow {
+
             val path = "${context.cacheDir.absolutePath}/${System.currentTimeMillis()}.mp4"
             val transformerListener: Transformer.Listener =
                 object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, result: ExportResult) {
                         Log.e("vsvx13", "onCompleted : $composition ${result.videoEncoderName}")
                         trySend(TransferState.Done(path))
-                        transformer.removeListener(this)
+                        close()
                     }
 
                     override fun onError(
@@ -68,7 +69,7 @@ class AndroidMediaTransfer @Inject constructor(
                     ) {
                         Log.e("vsvx13", "onError : $composition $result $exception")
                         trySend(TransferState.Error(exception.message))
-                        transformer.removeListener(this)
+                        close(exception)
                     }
                 }
             transformer.addListener(transformerListener)
@@ -90,13 +91,17 @@ class AndroidMediaTransfer @Inject constructor(
                     trySend(TransferState.Progress(progressHolder.progress))
                 }
             }
+
+            awaitClose {
+                transformer.removeListener(transformerListener)
+            }
         }
 
     override suspend fun startTransferMixingMusic(
         mediaUrl: String,
         mediaUrl2: String,
         musicUrl: String
-    ): Flow<String> = channelFlow {
+    ): Flow<String> = callbackFlow {
         val path = "${context.filesDir.absolutePath}/${System.currentTimeMillis()}.mp4"
         Log.e("vsvx13", "startTransferMixingMusic $path")
         val transformerListener: Transformer.Listener =
@@ -104,7 +109,6 @@ class AndroidMediaTransfer @Inject constructor(
                 override fun onCompleted(composition: Composition, result: ExportResult) {
                     Log.e("vsvx13", "onCompleted : videoEncoderName : ${result.videoEncoderName}")
                     trySend(path)
-                    transformer.removeListener(this)
                 }
 
                 override fun onError(
@@ -112,7 +116,6 @@ class AndroidMediaTransfer @Inject constructor(
                     exception: ExportException
                 ) {
                     Log.e("vsvx13", "onError : $composition $result $exception")
-                    transformer.removeListener(this)
                     throw RuntimeException("인코딩 오류")
                 }
             }
@@ -146,12 +149,10 @@ class AndroidMediaTransfer @Inject constructor(
 
         val videoSeq = EditedMediaItemSequence.Builder()
             .addItem(video1NoAudio)
-            .experimentalSetForceVideoTrack(true)
             .build()
 
         val videoSeq2 = EditedMediaItemSequence.Builder()
             .addItem(video2NoAudio)
-            .experimentalSetForceVideoTrack(true)
             .build()
 
         //    - 오디오 시퀀스: 배경음악 하나를 "루프"해서 비디오 길이 내내 재생하고 싶다면 isLooping = true
@@ -175,9 +176,13 @@ class AndroidMediaTransfer @Inject constructor(
             progressState = transformer.getProgress(progressHolder)
             Log.e("vsvx13", "progressHolder.progress ${progressHolder.progress}")
         }
+
+        awaitClose {
+            transformer.removeListener(transformerListener)
+        }
     }
 
-    private fun overlay(): TextureOverlay {
+    private fun overlay(): TextureEOverlay {
         return object : CanvasOverlay(true) {
             override fun onDraw(canvas: Canvas, presentationTimeUs: Long) {
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)

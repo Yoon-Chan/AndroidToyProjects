@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.media3ex.component.MiniPlayBar
 import com.example.media3ex.localprovider.ChromeController
 import com.example.media3ex.localprovider.LocalChromeController
 import com.example.media3ex.navigation.MainScreen
@@ -96,15 +97,10 @@ fun MediaUi(state: MediaScreen.State, modifier: Modifier = Modifier) {
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }
             ) {
-                Box(
-                    modifier = Modifier
-                        .statusBarsPadding()
-                        .fillMaxSize()
-                        .background(color = Color.Magenta),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Click Item ${state.currentId ?: -1}")
-                }
+                MiniPlayBar(
+                    modifier = Modifier,
+                    state.currentId ?: -1
+                )
             }
         }
     }
