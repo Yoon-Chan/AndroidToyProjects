@@ -40,6 +40,14 @@ fun MixingMusicScreenRoot(
         }
     }
 
+    val media2PickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            viewModel.onEvent(MixingMusicEvent.OnChangeMedia2(it.toString()))
+        }
+    }
+
     val musicPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -65,6 +73,9 @@ fun MixingMusicScreenRoot(
                 MixingMusicEvent.OnClickMediaSelect -> {
                     mediaPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
                 }
+                MixingMusicEvent.OnClickMediaSelect2 -> {
+                    media2PickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
+                }
                 else -> Unit
             }
             viewModel.onEvent(it)
@@ -89,6 +100,14 @@ fun MixingMusicScreen(
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = state.mediaUri ?: "미디어를 선택하지 않았습니다.")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { onEvent(MixingMusicEvent.OnClickMediaSelect2)}) {
+            Text(text = "영상 선택2")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = state.mediaUri2 ?: "미디어를 선택하지 않았습니다.")
 
         Spacer(modifier = Modifier.height(16.dp))
 

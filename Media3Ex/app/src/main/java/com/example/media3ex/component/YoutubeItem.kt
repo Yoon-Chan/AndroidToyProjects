@@ -1,5 +1,6 @@
 package com.example.media3ex.component
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.media3ex.ui.theme.Media3ExTheme
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun YoutubeItem(
     modifier: Modifier = Modifier,
@@ -28,7 +30,7 @@ fun YoutubeItem(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(16/9f)
+                .aspectRatio(16 / 9f)
                 .background(color = Color.LightGray)
                 .clickable(onClick = onClick)
         )

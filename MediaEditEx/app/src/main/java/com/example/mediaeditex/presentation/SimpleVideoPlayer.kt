@@ -1,5 +1,6 @@
 package com.example.mediaeditex.presentation
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -36,6 +38,9 @@ fun SimpleVideoPlayer(
     progress: Int? = null
 ) {
     val context = LocalContext.current
+    var videoRatio by remember {
+        mutableStateOf<Float?>(null)
+    }
     var isVisible by remember {
         mutableStateOf(false)
     }
@@ -57,14 +62,23 @@ fun SimpleVideoPlayer(
             setMediaItem(inputMediaItem)
             prepare()
             playWhenReady = true
-            size = videoSize
+            addListener(object : Player.Listener {
+                override fun onVideoSizeChanged(videoSize: VideoSize) {
+                    super.onVideoSizeChanged(videoSize)
+                    val width = videoSize.width // 비디오 너비 (픽셀)
+                    val height = videoSize.height // 비디오 높이 (픽셀)
+                    videoRatio = width.toFloat() / height.toFloat()
+                    Log.e("vsvx13", "size : ${width}, ${height}")
+                }
+            }
+            )
         }
     }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(size.pixelWidthHeightRatio)
+            .aspectRatio(videoRatio ?: 1f)
     ) {
         PlayerSurface(
             player = exoPlayer,

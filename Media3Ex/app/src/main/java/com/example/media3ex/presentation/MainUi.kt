@@ -1,7 +1,7 @@
 package com.example.media3ex.presentation
 
 import android.annotation.SuppressLint
-import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,17 +26,17 @@ import androidx.compose.ui.unit.min
 import com.example.media3ex.component.TopbarNestedScrollController
 import com.example.media3ex.component.YoutubeItem
 import com.example.media3ex.component.YoutubeTopbar
-import com.example.media3ex.localprovider.LocalChromeController
 import com.example.media3ex.navigation.MainEvent
 import com.example.media3ex.navigation.MainScreen
 import com.slack.circuit.codegen.annotations.CircuitInject
 import com.slack.circuit.runtime.ui.Ui
+import com.slack.circuit.sharedelements.SharedElementTransitionScope
 import dagger.hilt.android.components.ActivityRetainedComponent
 
 @CircuitInject(MainScreen::class, ActivityRetainedComponent::class)
 class MainUi : Ui<MainScreen.State> {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun Content(
@@ -52,38 +52,47 @@ class MainUi : Ui<MainScreen.State> {
         val nestedScroll = remember {
             TopbarNestedScrollController { x, y ->
                 val value = with(density) { y.toDp() }
-                if(offsetY + value <= ((-56).dp - statusBarDp -  16.dp)) {
-                    offsetY = ((-56).dp - statusBarDp -  16.dp)
+                if (offsetY + value <= ((-56).dp - statusBarDp - 16.dp)) {
+                    offsetY = ((-56).dp - statusBarDp - 16.dp)
                 } else {
-                    offsetY = min( offsetY + value, 0.dp)
+                    offsetY = min(offsetY + value, 0.dp)
                 }
             }
         }
 
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(color = Color.White)
-        ) {
-            LazyColumn(
-                modifier = Modifier
+
+        SharedElementTransitionScope {
+            Box(
+                modifier = modifier
                     .fillMaxSize()
-                    .nestedScroll(nestedScroll)
+                    .background(color = Color.White)
             ) {
-                items(10) {
-                    YoutubeItem(
-                        onClick = {
-                            state.eventSink(MainEvent.OnDetail(it.toLong()))
-                        }
-                    )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(nestedScroll)
+                ) {
+                    items(10) {
+                        YoutubeItem(
+                            modifier = Modifier
+                                .sharedBounds(
+                                    rememberSharedContentState(it.toLong()),
+                                    requireAnimatedScope(SharedElementTransitionScope.AnimatedScope.Navigation)
+                                ),
+                            onClick = {
+                                state.eventSink(MainEvent.OnDetail(it.toLong()))
+                            }
+                        )
+                    }
                 }
-            }
 
-            YoutubeTopbar(
-                modifier = Modifier
-                    .offset(x = 0.dp, y = offsetY),
-            )
+                YoutubeTopbar(
+                    modifier = Modifier
+                        .offset(x = 0.dp, y = offsetY),
+                )
+            }
         }
+
 
 //        AnimatedVisibility(
 //            visible = isDetail,

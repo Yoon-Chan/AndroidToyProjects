@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import com.example.media3ex.navigation.MediaScreen
 import com.example.media3ex.ui.theme.Media3ExTheme
 import com.slack.circuit.backstack.rememberSaveableBackStack
@@ -13,6 +14,7 @@ import com.slack.circuit.foundation.CircuitCompositionLocals
 import com.slack.circuit.foundation.NavigableCircuitContent
 import com.slack.circuit.foundation.rememberCircuitNavigator
 import com.slack.circuit.runtime.InternalCircuitApi
+import com.slack.circuit.sharedelements.SharedElementTransitionLayout
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,7 +24,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var circuit: Circuit
 
-    @OptIn(InternalCircuitApi::class)
+    @OptIn(InternalCircuitApi::class, ExperimentalSharedTransitionApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,10 +35,12 @@ class MainActivity : ComponentActivity() {
                 val navigator = rememberCircuitNavigator(backStack)
 
                 CircuitCompositionLocals(circuit = circuit) {
-                    NavigableCircuitContent(
-                        navigator = navigator,
-                        backStack = backStack,
-                    )
+                    SharedElementTransitionLayout {
+                        NavigableCircuitContent(
+                            navigator = navigator,
+                            backStack = backStack,
+                        )
+                    }
                 }
             }
         }

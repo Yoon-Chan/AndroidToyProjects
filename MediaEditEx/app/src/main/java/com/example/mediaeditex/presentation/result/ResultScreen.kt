@@ -1,5 +1,7 @@
 package com.example.mediaeditex.presentation.result
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -13,7 +15,11 @@ fun ResultScreenRoot(modifier: Modifier = Modifier, uri: String) {
 
 @Composable
 fun ResultScreen(modifier: Modifier = Modifier, uri: String) {
-    SimpleVideoPlayer(modifier = modifier, videoUrl = uri)
+    Scaffold(
+        modifier = modifier
+    ) { innerPadding ->
+        SimpleVideoPlayer(modifier = Modifier.padding(innerPadding), videoUrl = uri)
+    }
 }
 
 @Preview
